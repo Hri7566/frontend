@@ -1371,7 +1371,7 @@ $(function () {
       part.nameDiv.appendChild(textDiv);
       part.nameDiv.setAttribute("translated", "");
 
-      var arr = $("#names .name");
+      var arr = $("#names .name").toArray();
       arr.sort(function (a, b) {
         if (a.id > b.id) return 1;
         else if (a.id < b.id) return -1;
@@ -3459,39 +3459,41 @@ $(function () {
             msg.sender._id === gClient.user._id ||
             msg.recipient._id === gClient.user._id
           ) {
-            liString += `<span class="reply"/>`;
+            liString += `<span class="reply"></span>`;
           }
         } else {
-          liString += `<span class="reply"/>`;
+          liString += `<span class="reply"></span>`;
         }
 
-        if (gShowTimestampsInChat) liString += '<span class="timestamp"/>';
+        if (gShowTimestampsInChat) liString += '<span class="timestamp"></span>';
 
         if (msg.m === "dm") {
           if (msg.sender._id === gClient.user._id) {
             //sent dm
-            liString += '<span class="sentDm"/>';
+            liString += '<span class="sentDm"></span>';
           } else if (msg.recipient._id === gClient.user._id) {
             //received dm
-            liString += '<span class="receivedDm"/>';
+            liString += '<span class="receivedDm"></span>';
           } else {
             //someone else's dm
-            liString += '<span class="otherDm"/>';
+            liString += '<span class="otherDm"></span>';
             isSpecialDm = true;
           }
         }
 
         if (isSpecialDm) {
-          if (gShowIdsInChat) liString += '<span class="id"/>';
-          liString += '<span class="name"/><span class="dmArrow"/>';
-          if (gShowIdsInChat) liString += '<span class="id2"/>';
-          liString += '<span class="name2"/><span class="message"/>';
+          if (gShowIdsInChat) liString += '<span class="id"></span>';
+          liString += '<span class="name"></span><span class="dmArrow"></span>';
+          if (gShowIdsInChat) liString += '<span class="id2"></span>';
+          liString += '<span class="name2"></span><span class="message"></span>';
         } else {
-          if (gShowIdsInChat) liString += '<span class="id"/>';
-          liString += '<span class="name"/>';
-          if (msg.r) liString += `<span class="replyLink"/>`;
-          liString += '<span class="message"/>';
+          if (gShowIdsInChat) liString += '<span class="id"></span>';
+          liString += '<span class="name"></span>';
+          if (msg.r) liString += `<span class="replyLink"></span>`;
+          liString += '<span class="message"></span>';
         }
+
+        liString += '</li>';
 
         var li = $(liString);
         li.find(`.reply`).text("➦");
