@@ -1,5 +1,5 @@
 {
-    "people are playing_one": "men is aan het spelen",
+    "people are playing_one": "man is aan het spelen",
     "people are playing_other": "mensen zijn aan het spelen",
     "New Room...": "Nieuwe Kamer…",
     "room name": "kamer naam",
@@ -14,7 +14,7 @@
     "Get Crown": "Kroon krijgen",
     "Volume": "Volume",
     "Inner color:": "Binnen kleur:",
-    "Player limit:": "Speler limiet:",
+    "Player limit:": "Speler limiet lol",
     "USER SET": "NAAM ZETTEN",
     "Reason:": "Reden:",
     "Seconds": "Seconden",
@@ -99,5 +99,6 @@
     "Mute Notes": "Noten dempen",
     "Mute Chat": "Chat dempen",
     "Direct Message": "Prive bericht",
-    "Me": "Ik"
+    "Me": "Ik",
+    "Language": "Taal"
 }
