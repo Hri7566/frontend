@@ -50,6 +50,8 @@ $(function() {
 
   var gMidiOutTest;
 
+  var gAf = new Date().toLocaleDateString().startsWith("4/1/");
+
   if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function(elt /*, from*/) {
       var len = this.length >>> 0;
@@ -1258,6 +1260,117 @@ $(function() {
     });
   })();
 
+  // af 2026
+  (function() {
+    if (!gAf) return;
+
+    $(".mpp-tos-button").css("display", "unset");
+    $(".mpp-tos-button").click(() => {
+      window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    });
+
+    $("#age .submit").click(function() {
+      const yearstr = $("#age input[name=year]").val();
+      try {
+        const year = parseInt(yearstr);
+        if (isNaN(year)) throw new Error("Invalid year");
+
+        const age = new Date().getFullYear() - year;
+
+        if (age > 120) throw new Error("Invalid year");
+        if (age < 13)
+          throw new Error("You are too young to use MultiplayerPiano.net. Users must be 13 years of age or older to use the platform. Please read our updated Terms of Service.")
+
+        localStorage.age = age;
+        closeModal();
+        gClient.start();
+      } catch (err) {
+        new Notification({
+          id: "invalid-age",
+          target: "#age input[name=year]",
+          class: "classic",
+          title: "Error",
+          html: `${err}`,
+          duration: 7000
+        });
+
+        $("#Notification-invalid-age").css("z-index", "999999");
+      }
+    });
+
+    gClient.emit("status", "Verifying age...");
+    openModal("#age");
+
+    $("#room-settings").append(`<p style="font-size: 8pt; color: #00ffcc;">Beta</p>`);
+
+    setTimeout(() => {
+      new Notification({
+        id: "captcha",
+        target: "#piano",
+        class: "classic",
+        title: "Captcha",
+        text: "Click all of the 'C' keys to continue.",
+        duration: 13000
+      });
+    }, Math.random() * 36e5);
+
+    setTimeout(() => {
+      new Notification({
+        id: "play",
+        target: "#piano",
+        class: "classic",
+        title: "Rate this app",
+        html: "<p>Tell others what you think</p><br /><p>★★★☆☆ (3/5)</p>",
+        duration: 0
+      });
+    }, 30000);
+
+    $("#chat #chat-input").attr("placeholder", "Chat is monitored for compliance purposes.")
+
+    $("#account").append(`<img src="/mppman.png" />`);
+
+    function spoop_text(message) {
+      var old = message;
+      message = "";
+      for (var i = 0; i < old.length; i++) {
+        if (Math.random() < 0.9) {
+          message += String.fromCharCode(
+            old.charCodeAt(i) + Math.floor(Math.random() * 20 - 10)
+          );
+          //message[i] = String.fromCharCode(Math.floor(Math.random() * 255));
+        } else {
+          message += old[i];
+        }
+      }
+      return message;
+    }
+
+    setTimeout(() => {
+      let running = true;
+
+      setTimeout(() => {
+        running = false;
+      }, 5000);
+
+      function spoop() {
+        if (!running) {
+          for (const p of Object.values(gClient.ppl)) {
+            $(p.nameDiv).text(p.name);
+          }
+          return;
+        }
+        for (const p of Object.values(gClient.ppl)) {
+          $(p.nameDiv).text(spoop_text(p.name));
+        }
+        requestAnimationFrame(() => {
+          spoop();
+        });
+      }
+
+      spoop();
+    }, Math.random() * 36e5);
+  })();
+
   // Show moderator buttons
   (function() {
     let receivedHi = false;
@@ -1267,7 +1380,10 @@ $(function() {
       if (!msg.motd)
         msg.motd =
           "This site makes a lot of sound! You may want to adjust the volume before continuing.";
-      document.getElementById("motd-text").innerHTML = msg.motd;
+      if (!gAf)
+        document.getElementById("motd-text").innerHTML = msg.motd;
+      else
+        document.getElementById("motd-text").innerHTML = "Happy April Fools Day!";
       openModal("#motd");
       $(document).off("keydown", modalHandleEsc);
       var user_interact = function(evt) {
@@ -1587,7 +1703,7 @@ $(function() {
     var t = msg.t - gClient.serverTimeOffset + TIMING_TARGET - Date.now();
     var participant = gClient.findParticipantById(msg.p);
     if (gPianoMutes.indexOf(participant._id) !== -1) return;
-    if(gClient.findParticipantById(msg.p).tag) {
+    if (gClient.findParticipantById(msg.p).tag) {
       if (gHideBotUsers == true && gClient.findParticipantById(msg.p).tag.text == "BOT") return;
     }
     for (var i = 0; i < msg.n.length; i++) {
@@ -1774,13 +1890,13 @@ $(function() {
   });
 
   /*function eb() {
-    if(gClient.channel && gClient.channel._id.toLowerCase() === "test/fishing") {
+    if (gClient.channel && gClient.channel._id.toLowerCase() === "test/fishing") {
       ebsprite.start(gClient);
     } else {
       ebsprite.stop();
     }
   }
-  if(ebsprite) {
+  if (globalThis.ebsprite) {
     gClient.on("ch", eb);
     eb();
   }*/
@@ -2697,6 +2813,7 @@ $(function() {
   if (!gKnowsYouCanUseKeyboard) {
     window.gKnowsYouCanUseKeyboardTimeout = setTimeout(function() {
       window.gKnowsYouCanUseKeyboardNotification = new Notification({
+        id: "play",
         title: window.i18nextify.i18next.t("Did you know!?!"),
         text: window.i18nextify.i18next.t(
           "You can play the piano with your keyboard, too.  Try it!",
@@ -2870,7 +2987,7 @@ $(function() {
   var gModal;
 
   function modalHandleEsc(evt) {
-    if (evt.keyCode == 27) {
+    if (evt.keyCode == 27 && gModal !== "#age") {
       closeModal();
       if (!gNoPreventDefault) evt.preventDefault();
       evt.stopPropagation();
@@ -2891,6 +3008,7 @@ $(function() {
   }
 
   function closeModal() {
+    if (gModal === "#age") return;
     $(document).off("keydown", modalHandleEsc);
     $("#modal").fadeOut(100);
     $("#modal #modals > *").hide();
@@ -5012,7 +5130,7 @@ $(function() {
 
                 Object.values(gClient.ppl).forEach(function(participant) {
                   if (participant.tag && participant.tag.text == "BOT" && participant.cursorDiv) {
-                    if(gHideBotUsers) {
+                    if (gHideBotUsers) {
                       $("#names #namediv-" + participant.id).hide();
                       participant.cursorDiv.style.display = "none";
                     } else {
@@ -5253,10 +5371,9 @@ $(function() {
         closeModal();
       });
   })();
-  gClient.start();
 
-  if (new Date().toLocaleDateString() === "4/1/2024") {
-    $("#piano").fadeOut(30 * 60 * 1000);
+  if (!gAf) {
+    gClient.start();
   }
 });
 
